@@ -76,6 +76,7 @@ $result = $mysqli->query($sql);
         <?php endwhile; ?>
     </table>
 
+    <a href="index.php" class="btn-back">Trở về danh sách sinh viên</a>
 </body>
 </html>
 

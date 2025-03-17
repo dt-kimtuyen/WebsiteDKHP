@@ -1,4 +1,6 @@
 <?php
+session_start();  // Khởi tạo session
+
 // Kết nối cơ sở dữ liệu
 $mysqli = new mysqli("localhost", "root", "", "testt");
 
@@ -6,17 +8,19 @@ $mysqli = new mysqli("localhost", "root", "", "testt");
 if ($mysqli->connect_error) {
     die("Connection failed: " . $mysqli->connect_error);
 }
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    // Lấy mã sinh viên từ form
     $maSV = $_POST['MaSV'];
 
-    // Kiểm tra xem sinh viên có tồn tại trong CSDL không
+    // Kiểm tra thông tin đăng nhập (chỉ kiểm tra mã sinh viên)
     $sql = "SELECT * FROM SinhVien WHERE MaSV = '$maSV'";
     $result = $mysqli->query($sql);
 
     if ($result->num_rows > 0) {
         // Lưu mã sinh viên vào session
         $_SESSION['MaSV'] = $maSV;
-        header("Location: hocphan.php");  // Chuyển hướng đến trang học phần
+        echo "<script>alert('Đăng nhập thành công!'); window.location.href='index.php';</script>";
     } else {
         echo "<script>alert('Mã sinh viên không hợp lệ!');</script>";
     }
@@ -29,46 +33,73 @@ $mysqli->close();  // Đóng kết nối
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đăng Nhập</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f4; }
-        .login-form {
-            width: 300px;
-            margin: 100px auto;
-            padding: 20px;
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .login-container {
             background-color: #fff;
+            padding: 40px;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
         }
-        .login-form input {
+        .login-container h1 {
+            text-align: center;
+            color: #333;
+        }
+        .input-field {
             width: 100%;
             padding: 10px;
-            margin: 10px 0;
-            font-size: 14px;
-            border: 1px solid #ccc;
+            margin: 15px 0;
+            border: 1px solid #ddd;
             border-radius: 4px;
+            font-size: 16px;
         }
-        .login-form button {
+        .input-field:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+        .btn-submit {
             width: 100%;
-            padding: 10px;
-            background-color: #007bff;
-            color: white;
+            padding: 12px;
+            background-color: #4CAF50;
             border: none;
-            border-radius: 5px;
+            border-radius: 4px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
         }
-        .login-form button:hover { background-color: #0056b3; }
+        .btn-submit:hover {
+            background-color: #45a049;
+        }
+        .alert {
+            color: red;
+            text-align: center;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
-
-    <div class="login-form">
-        <h2>Đăng Nhập</h2>
+    <div class="login-container">
+        <h1>Đăng Nhập</h1>
         <form method="POST">
-            <label for="MaSV">Mã Sinh Viên:</label>
-            <input type="text" id="MaSV" name="MaSV" required>
-            <button type="submit">Đăng Nhập</button>
+            <input type="text" id="MaSV" name="MaSV" class="input-field" placeholder="Nhập mã sinh viên" required>
+            <button type="submit" class="btn-submit">Đăng Nhập</button>
         </form>
+        <?php if (isset($result) && $result->num_rows == 0): ?>
+            <div class="alert">Mã sinh viên không hợp lệ!</div>
+        <?php endif; ?>
     </div>
-
 </body>
 </html>
